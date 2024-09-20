@@ -6,8 +6,6 @@ require("dotenv").config();
 const client = new DynamoDBClient({
     region: process.env.REGION || "local",
 });
-
-// Create a Document client to simplify working with DynamoDB
 const docClient = DynamoDBDocumentClient.from(client);
 const TableName = process.env.ORDERS_TABLE || 'Orders';
 // Handler function for AWS Lambda

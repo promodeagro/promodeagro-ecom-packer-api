@@ -34,6 +34,7 @@ UploadPackingPhoto:
           method: post
           cors: true
 
+          
 CompletePackOrder:
     handler: home/CompletePackOrder.handler
     role: ${env:LAMBDA_ROLE}

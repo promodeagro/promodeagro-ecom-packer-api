@@ -24,7 +24,6 @@ exports.handler = async (event) => {
     }
 
     try {
-        // Fetch the order from the "Orders" table
         const getParams = {
             TableName: TableName,
             Key: { id: orderId },

@@ -9,7 +9,6 @@ const client = new DynamoDBClient({
 const docClient = DynamoDBDocumentClient.from(client);
 const TableName = process.env.ORDERS_TABLE || 'Orders';
 
-// Handler function for AWS Lambda
 exports.handler = async (event) => {
     console.log("Event received:", JSON.stringify(event));
     try {

@@ -83,7 +83,7 @@ exports.handler = async event => {
         // If upload is successful
         if (statusCode === 200) {
             const uuid = crypto.randomUUID();
-            // Store in DynamoDB
+        // Store in DynamoDB
             const dynamoParams = {
                 TableName: TableName,
                 Item: {
