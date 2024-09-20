@@ -1,0 +1,47 @@
+UnpackedOrders:
+    handler: home/UnpackedOrders.handler
+    role: ${env:LAMBDA_ROLE}
+    events:
+      - http:
+          path: /Unpacked-Orders
+          method: get
+          cors: true
+
+PackedOrders:
+    handler: home/PackedOrders.handler
+    role: ${env:LAMBDA_ROLE}
+    events:
+      - http:
+          path: /Packed-Orders
+          method: get
+          cors: true
+
+OrderDetails:
+    handler: home/OrderDetails.handler
+    role: ${env:LAMBDA_ROLE}
+    events:
+      - http:
+          path: /orders/{orderId}
+          method: get
+          cors: true
+
+UploadPackingPhoto:
+    handler: home/UploadPackingPhoto.handler
+    role: ${env:LAMBDA_ROLE}
+    events:
+      - http:
+          path: /orders/{orderId}/upload-photo
+          method: post
+          cors: true
+
+CompletePackOrder:
+    handler: home/CompletePackOrder.handler
+    role: ${env:LAMBDA_ROLE}
+    events:
+      - http:
+          path: /orders/{orderId}/complete
+          method: put
+          cors: true
+
+
+
