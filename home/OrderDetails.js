@@ -28,7 +28,7 @@ exports.handler = async (event) => {
         const data = await docClient.send(command)
         // Construct the response based on the provided structure
         const orderDetails = {
-            OrderId: data.Item.id,
+            OrderId: data.Item.id.slice(-7),
             CustomerName: data.Item.customerName,
             Payment: {
                 method: data.Item.paymentDetails?.method

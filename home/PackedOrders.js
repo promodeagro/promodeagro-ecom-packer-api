@@ -37,7 +37,7 @@ exports.handler = async (event) => {
 
         // Example aggregation logic to collect all packed orders
         const result = data.Items.map(item => ({
-            OrderId: item.id,
+            OrderId: item.id.slice(-7),
             CustomerName: item.customerName,
             TotalItems: item.items.length,
             OrderStatus: item.status

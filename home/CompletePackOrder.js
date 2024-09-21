@@ -31,13 +31,13 @@ exports.handler = async (event) => {
 
         const getResult = await docClient.send(new GetCommand(getParams));
         const item = getResult.Item;
-
         if (!item) {
             return {
                 statusCode: 404,
-                body: JSON.stringify({ message: "Order not found." }),
+                body: JSON.stringify({ message: "Order id not found." }),
             };
         }
+        const shortOrderId = item.id.slice(-7);
         // Update the order status to "Packed"
         const updateParams = {
             TableName: TableName,
@@ -66,7 +66,7 @@ exports.handler = async (event) => {
         return {
             statusCode: 200,
             body: JSON.stringify({
-                message: `Order id ${orderId} has been Packed successfully`,
+                message: `Order id ${shortOrderId} has been Packed successfully`,
                 // stepFunctionExecutionArn: stepFunctionResult.executionArn
             }),
         };

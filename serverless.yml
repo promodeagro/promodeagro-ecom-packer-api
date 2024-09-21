@@ -32,7 +32,8 @@ provider:
 functions:
   - ${file(home/function.yml)}
   # - ${file(notification/function.yml)}
-  # - ${file(profile-details/function.yml)}
+  - ${file(profile-details/function.yml)}
+  # - ${file(login/function.yml)}
 
   
 plugins:
