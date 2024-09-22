@@ -19,7 +19,7 @@ exports.handler = async (event) => {
                 "#status": "status" 
             },
             ExpressionAttributeValues: {
-                ":status": "delivered" 
+                ":status": "order placed" 
             }
         };
         const command = new ScanCommand(params);
