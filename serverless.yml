@@ -13,19 +13,6 @@ provider:
   region: us-east-1
   runtime: nodejs18.x
   role: arn:aws:iam::851725323791:role/ecommerce_Lambda_Role
-  versionFunctions: false
-  httpApi:
-    cors:
-      allowedOrigins:
-        - "*"
-      allowedHeaders:
-        - "*"
-      allowedMethods:
-        - OPTIONS
-        - GET
-        - POST
-        - PUT
-        - DELETE
 
 functions:
   - ${file(home/function.yml)}
