@@ -15,6 +15,10 @@ exports.handler = async (event) => {
     if (!orderId) {
         return {
             statusCode: 400,
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+				"Access-Control-Allow-Credentials": true,
+            },
             body: JSON.stringify({ message: "orderId is required" })
         };
     }
@@ -50,12 +54,20 @@ exports.handler = async (event) => {
 
         return {
             statusCode: 200,
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+				"Access-Control-Allow-Credentials": true,
+            },
             body: JSON.stringify(orderDetails)
         };
     } catch (error) {
         console.error("Error fetching order details:", error.stack || error);
         return {
             statusCode: 500,
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+				"Access-Control-Allow-Credentials": true,
+            },
             body: JSON.stringify({
                 message: "Error processing request",
                 error: error.message || "Unknown error"

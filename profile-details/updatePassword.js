@@ -32,6 +32,10 @@ exports.handler = async (event) => {
         if (!data.Item) {
             return {
                 statusCode: 404,
+                headers: {
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Credentials": true,
+                },
                 body: JSON.stringify({ message: "User not found", statusCode: 404 }),
             };
         }
@@ -42,6 +46,10 @@ exports.handler = async (event) => {
         if (user.Name !== userName) {
             return {
                 statusCode: 400,
+                headers: {
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Credentials": true,
+                },
                 body: JSON.stringify({ message: "User name does not match our records.", statusCode: 400 }),
             };
         }
@@ -49,6 +57,10 @@ exports.handler = async (event) => {
         if (user.email !== email) {
             return {
                 statusCode: 400,
+                headers: {
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Credentials": true,
+                },
                 body: JSON.stringify({ message: "Email does not match our records.", statusCode: 400 }),
             };
         }
@@ -78,6 +90,10 @@ exports.handler = async (event) => {
         if (error instanceof z.ZodError) {
             return {
                 statusCode: 400,
+                headers: {
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Credentials": true,
+                },
                 body: JSON.stringify({
                     message: "Validation errors occurred.",
                     errors: error.errors.map(e => `${e.path.join('.')} ${e.message}`),
@@ -88,6 +104,10 @@ exports.handler = async (event) => {
         console.error("Error updating user profile:", error.stack || error);
         return {
             statusCode: 500,
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+				"Access-Control-Allow-Credentials": true,
+            },
             body: JSON.stringify({ message: "Internal Server Error", error: error.message }),
         };
     }

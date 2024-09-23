@@ -17,6 +17,10 @@ exports.handler = async (event) => {
     if (!orderId || !Status || Status !== 'Packed') {
         return {
             statusCode: 400,
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+				"Access-Control-Allow-Credentials": true,
+            },
             body: JSON.stringify({
                 message: "Invalid request. Ensure orderId and status ('Packed') are provided."
             }),
@@ -34,6 +38,10 @@ exports.handler = async (event) => {
         if (!item) {
             return {
                 statusCode: 404,
+                headers: {
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Credentials": true,
+                },
                 body: JSON.stringify({ message: "Order id not found." }),
             };
         }
@@ -64,6 +72,10 @@ exports.handler = async (event) => {
         const stepFunctionResult = await stepfunctions.startExecution(stepFunctionParams).promise();
         return {
             statusCode: 200,
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+				"Access-Control-Allow-Credentials": true,
+            },
             body: JSON.stringify({
                 message: `Order id ${orderId} has been Packed successfully`,
                 // stepFunctionExecutionArn: stepFunctionResult.executionArn
@@ -73,6 +85,10 @@ exports.handler = async (event) => {
         console.error("Error processing request:", error);
         return {
             statusCode: 500,
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+				"Access-Control-Allow-Credentials": true,
+            },
             body: JSON.stringify({
                 message: "Internal server error",
                 error: error.message

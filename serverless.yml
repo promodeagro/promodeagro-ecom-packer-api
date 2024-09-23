@@ -4,19 +4,17 @@ frameworkVersion: "3"
 
 useDotenv: true
 
+custom:
+  stage: ${opt:stage, 'dev'}
+
 provider:
   name: aws
-  stage: dev
+  stage: ${self:custom.stage}
   region: us-east-1
   runtime: nodejs18.x
   role: arn:aws:iam::851725323791:role/ecommerce_Lambda_Role
   versionFunctions: false
   httpApi:
-   
-    # authorizers:
-    #   customAuthorizer:
-    #     type: request
-    #     functionName: authorizer
     cors:
       allowedOrigins:
         - "*"
