@@ -10,7 +10,6 @@ const docClient = DynamoDBDocumentClient.from(client);
 const TableName = process.env.ORDERS_TABLE || 'Orders';
 
 exports.handler = async (event) => {
-    console.log("Event received:", JSON.stringify(event));
     try {
         const params = {
             TableName: TableName,
@@ -25,11 +24,15 @@ exports.handler = async (event) => {
         const command = new ScanCommand(params);
         const data = await docClient.send(command);
         if (!data.Items || data.Items.length === 0) {
-            console.log("No packed orders found");
+            console.log("No Unpacked orders found");
             return {
                 statusCode: 200,
+                headers: {
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Credentials": true,
+                },
                 body: JSON.stringify({
-                    TotalPackedOrders: 0
+                    TotalUnpackedOrders: 0
                 })
             };
         }
@@ -44,6 +47,10 @@ exports.handler = async (event) => {
 
         return {
             statusCode: 200,
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+				"Access-Control-Allow-Credentials": true,
+            },
             body: JSON.stringify({
                 TotalUnpackedOrders: result.length,
                 UnpackedOrders: result
@@ -53,6 +60,10 @@ exports.handler = async (event) => {
         console.error("Error processing request:", error);
         return {
             statusCode: 500,
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+				"Access-Control-Allow-Credentials": true,
+            },
             body: JSON.stringify({
                 message: "Error processing request",
                 error: error.message
