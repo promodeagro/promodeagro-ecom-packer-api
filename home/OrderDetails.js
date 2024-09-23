@@ -4,7 +4,7 @@ require("dotenv").config();
 
 // Initialize the DynamoDB client
 const client = new DynamoDBClient({
-    region: process.env.REGION || "local",
+    region: process.env.REGION || "us-east-1",
 });
 const docClient = DynamoDBDocumentClient.from(client);
 const TableName = process.env.ORDERS_TABLE || 'Orders';
@@ -28,7 +28,7 @@ exports.handler = async (event) => {
         const data = await docClient.send(command)
         // Construct the response based on the provided structure
         const orderDetails = {
-            OrderId: data.Item.id.slice(-7),
+            OrderId: data.Item.id,
             CustomerName: data.Item.customerName,
             Payment: {
                 method: data.Item.paymentDetails?.method

@@ -4,7 +4,7 @@ require("dotenv").config();
 
 // Initialize the DynamoDB client
 const client = new DynamoDBClient({
-    region: process.env.REGION || "local",
+    region: process.env.REGION || "us-east-1",
 });
 const docClient = DynamoDBDocumentClient.from(client);
 const TableName = process.env.ORDERS_TABLE || 'Orders';
@@ -36,9 +36,9 @@ exports.handler = async (event) => {
 
         // Example aggregation logic to collect all packed orders
         const result = data.Items.map(item => ({
-            OrderId: item.id.slice(-7),
+            OrderId: item.id,
             CustomerName: item.customerName,
-            TotalItems: item.items.length,
+            TotalItems: Array.isArray(item.items) ? item.items.length : 0,
             OrderStatus: item.status
         }));
 
