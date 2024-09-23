@@ -1,0 +1,456 @@
+openapi: 3.0.3
+info:
+  title: Packer Application
+  version: 1.0.0
+
+tags:
+  - name: Home
+    description: APIs related to the Home page
+  - name: Profile-Details
+    description: APIs related to the Profile details
+  - name: Order-Call
+    description: APIs related to Order management
+  - name: Notification
+    description: APIs related to Notifications
+
+paths:
+  /getAllUnpackedOrders:
+    get:
+      tags:
+        - Home
+      summary: Get overview of unpacked orders
+      operationId: UnpackedOrders
+      responses:
+        "200":
+          description: Returns a list of unpacked orders
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  TotalUnpackedOrders:
+                    type: integer
+                    description: "The total number of unpacked orders"
+                    example: 53
+                  UnpackedOrders:
+                    type: array
+                    description: "List of unpacked orders"
+                    items:
+                      type: object
+                      properties:
+                        OrderId:
+                          type: string
+                          description: "Unique identifier for the order"
+                          example: "401-7538638-2568712"
+                        CustomerName:
+                          type: string
+                          description: "Name of the customer"
+                          example: "Mr"
+                        TotalItems:
+                          type: integer
+                          description: "The total number of items in the order"
+                          example: 2
+                        OrderStatus:
+                          type: string
+                          description: "The status of the order"
+                          example: "unpacked"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: "Error message describing what went wrong"
+
+  /getAllPackedOrders:
+    get:
+      tags:
+        - Home
+      summary: Get overview of packed orders
+      operationId: PackedOrders
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  TotalPackedOrders:
+                    type: integer
+                    description: "The total number of Packed orders"
+                    example: 53
+                  PackedOrders:
+                    type: array
+                    description: "List of Packed orders"
+                    items:
+                      type: object
+                      properties:
+                        OrderId:
+                          type: string
+                          description: "Unique identifier for the order"
+                          example: "401-7538638-2568712"
+                        CustomerName:
+                          type: string
+                          description: "Name of the customer"
+                          example: "Mr"
+                        TotalItems:
+                          type: integer
+                          description: "The total number of items in the order"
+                          example: 2
+                        OrderStatus:
+                          type: string
+                          description: "The status of the order"
+                          example: "Packed"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /OrderDetails/{orderId}:
+    get:
+      tags:
+        - Home
+      summary: Get details of a specific order
+      operationId: OrderDetails
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+            description: "Unique identifier for the order"
+            example: "401-7538638-2568712"
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  OrderId:
+                    type: string
+                    description: "Unique identifier for the order"
+                    example: "2568712"
+                  CustomerName:
+                    type: string
+                    description: "Name of the customer"
+                    example: "Maruti s"
+                  Payment:
+                    type: string
+                    description: "Payment option used by the customer"
+                    example: "COD/UPI/CARD"
+                  Price:
+                    type: integer
+                    description: "Total price after placing the order"
+                    example: 60
+                  items:
+                    type: number
+                    description: "Number of items in the order"
+                    example: 1
+                  ItemsList:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        Name:
+                          type: string
+                          description: "Product name"
+                          example: "Potato"
+                        Quantity:
+                          type: string
+                          description: "Quantity with unit (e.g., grams, pieces)"
+                          example: "1kg"
+                        Price:
+                          type: string
+                          description: "Price of the item"
+                          example: "RS 40"
+                  CostDetails:
+                    type: object
+                    properties:
+                      SubTotal:
+                        type: string
+                        description: "Subtotal amount"
+                        example: "RS 40"
+                      ShippingCharges:
+                        type: string
+                        description: "Shipping charges applied"
+                        example: "RS 20"
+                      GrossDetails:
+                        type: string
+                        description: "Gross amount"
+                        example: "RS 60"
+                      TotalAmount:
+                        type: string
+                        description: "Total amount to be paid"
+                        example: "RS 60"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /orders/{orderId}/upload-photo:
+    post:
+      tags:
+        - Home
+      summary: Upload a photo of a packed order
+      operationId: UploadPackingPhoto
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+            description: "Unique identifier for the order"
+            example: "401-7538638-2568712"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: string
+                  description: "Base64 encoded image data"
+                  example: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAYkAAAFqCAYAAADvDaaR"
+                OrderId: 
+                  type: string
+                  description: "responce orderId"
+                  example: "401-5110179-1194425"
+      responses:
+        "200":
+          description: Photo uploaded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Photo uploaded successfully"
+                  photoUrl:
+                    type: string
+                    description: "URL of the uploaded photo stored in the database"
+                    example: "https://ecomdmsservice.s3.amazonaws.com/Product-images/"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Internal Server Error"
+
+  /orders/{orderId}/CompletePacked:
+    put:
+      tags:
+        - Home
+      summary: Mark the order as packed and complete the packing process
+      operationId: CompletePackOrder
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                # photoUrl:
+                #   type: string
+                #   description: "URL of the completed packaging order"
+                #   example: "https://ecomdmsservice.s3.amazonaws.com/Product-images/1726487153714-Amla.jpg"
+                # packagedAt:
+                #   type: string
+                #   description: "Timestamp of when the package was completed"
+                #   example: "2023-08-30T12:38:00Z"
+                Status:
+                  type: string
+                  enum: [Packed]
+      responses:
+        "200":
+          description: Order packing completed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  orderId:
+                    type: string
+                    description: "Order ID of the completed package"
+                    example: "2568712"
+                  status:
+                    type: string
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /updatePassword:
+    put:
+      tags:
+        - Profile-Details
+      summary: Update user profile details
+      operationId: updateProfile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userName:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+      responses:
+        "200":
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /Order-Call:
+    post:
+      tags:
+        - Order-Call
+      summary: Handle call disconnections and trigger notifications
+      operationId: handleOrderCall
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                orderId:
+                  type: string
+                  description: "Unique identifier for the orderID"
+                  example: "401-7538638-2568712"
+                customerName:
+                  type: string
+                callStatus:
+                  type: string
+                  enum: [disconnected, not_answered]
+                timestamp:
+                  type: string
+                  format: date-time
+              required:
+                - orderId
+                - customerName
+                - callStatus
+                - timestamp
+      responses:
+        "200":
+          description: Notification triggered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  details:
+                    type: object
+                    properties:
+                      orderId:
+                        type: string
+                        description: "Unique identifier for the orderID"
+                        example: "401-7538638-2568712"
+                      customerName:
+                        type: string
+                      itemsCount:
+                        type: integer
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /notifications:
+    get:
+      tags:
+        - Notification
+      summary: Retrieve a list of notifications
+      operationId: getNotifications
+      responses:
+        "200":
+          description: List of notifications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    OrderId:
+                      type: string
+                      description: "Unique identifier for the orderID"
+                      example: "401-7538638-2568712"
+                    message:
+                      type: string
+                    timestamp:
+                      type: string
+                      format: date-time
+                    read:
+                      type: boolean
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
