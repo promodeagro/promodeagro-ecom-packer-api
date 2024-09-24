@@ -7,17 +7,35 @@ const client = new DynamoDBClient({
     region: process.env.REGION || "us-east-1",
 });
 const docClient = DynamoDBDocumentClient.from(client);
-const TableName = process.env.ORDERS_TABLE || 'Orders';
+const OrdersTableName = process.env.ORDERS_TABLE || 'Orders';
+const ProductsTableName = process.env.PRODUCTS_TABLE || 'prod-promodeargo-admin-productsTable';
+
+// Helper function to fetch product details
+async function getProductDetails(productId) {
+    const params = {
+        TableName: ProductsTableName,
+        Key: { id: productId }
+    };
+
+    try {
+        const productCommand = new GetCommand(params);
+        const productData = await docClient.send(productCommand);
+        return productData.Item ? productData.Item.images : null; 
+    } catch (error) {
+        console.error(`Error fetching product ${productId}:`, error.stack || error);
+        return null; 
+    }
+}
+
 // Handler function for AWS Lambda
 exports.handler = async (event) => {
-    
     const orderId = event.pathParameters?.orderId;
     if (!orderId) {
         return {
             statusCode: 400,
             headers: {
                 "Access-Control-Allow-Origin": "*",
-				"Access-Control-Allow-Credentials": true,
+                "Access-Control-Allow-Credentials": true,
             },
             body: JSON.stringify({ message: "orderId is required" })
         };
@@ -25,11 +43,38 @@ exports.handler = async (event) => {
 
     try {
         const params = {
-            TableName: TableName,
+            TableName: OrdersTableName,
             Key: { id: orderId }
         };
+
+        // Fetch order details
         const command = new GetCommand(params);
-        const data = await docClient.send(command)
+        const data = await docClient.send(command);
+
+        if (!data.Item) {
+            return {
+                statusCode: 404,
+                headers: {
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Credentials": true,
+                },
+                body: JSON.stringify({ message: "Order not found" }),
+            };
+        }
+
+        // Fetch product images for each item in the order
+        const itemsWithImages = await Promise.all(data.Item.items.map(async (item) => {
+            const productId = item.productId;
+            const images = await getProductDetails(productId); 
+
+            return {
+                Name: item.productName || "Unknown",
+                Quantity: item.quantityUnits,
+                Price: item.price,
+                Images: images || []
+            };
+        }));
+
         // Construct the response based on the provided structure
         const orderDetails = {
             OrderId: data.Item.id,
@@ -39,11 +84,7 @@ exports.handler = async (event) => {
             },
             Price: data.Item.subTotal || 0,
             items: data.Item.items.length,
-            ItemsList: data.Item.items?.map(item => ({
-                Name: item.productName || "Unknown",
-                Quantity: item.quantityUnits,
-                Price: item.price
-            })) || [],
+            ItemsList: itemsWithImages,
             CostDetails: {
                 SubTotal: data.Item.subTotal,
                 ShippingCharges: data.Item.deliveryCharges,
@@ -56,7 +97,7 @@ exports.handler = async (event) => {
             statusCode: 200,
             headers: {
                 "Access-Control-Allow-Origin": "*",
-				"Access-Control-Allow-Credentials": true,
+                "Access-Control-Allow-Credentials": true,
             },
             body: JSON.stringify(orderDetails)
         };
@@ -66,7 +107,7 @@ exports.handler = async (event) => {
             statusCode: 500,
             headers: {
                 "Access-Control-Allow-Origin": "*",
-				"Access-Control-Allow-Credentials": true,
+                "Access-Control-Allow-Credentials": true,
             },
             body: JSON.stringify({
                 message: "Error processing request",
