@@ -1,5 +1,6 @@
 const { z } = require("zod");
 const { uploadToS3 } = require("../upload/uploads3");
+const crypto = require('crypto');
 const AWS = require("aws-sdk");
 
 const dynamoDB = new AWS.DynamoDB.DocumentClient();
