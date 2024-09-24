@@ -2,7 +2,6 @@ const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
 const { DynamoDBDocumentClient, GetCommand } = require("@aws-sdk/lib-dynamodb");
 require("dotenv").config();
 
-// Initialize the DynamoDB client
 const client = new DynamoDBClient({
     region: process.env.REGION || "us-east-1",
 });
