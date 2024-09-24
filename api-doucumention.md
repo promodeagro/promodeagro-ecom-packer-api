@@ -85,30 +85,52 @@ This endpoint is used to OrderDetails.
 
 ```json
 {
-    "OrderId": "401-3680557-6464026",
+    "OrderId": "401-1070431-1348467",
     "CustomerName": "sukanta halder",
     "Payment": {
         "method": "cash"
     },
-    "Price": 122,
-    "items": 2,
+    "Price": 208,
+    "items": 5,
     "ItemsList": [
         {
-            "Name": "Dragon fruit red",
+            "Name": "Cauliflower",
             "Quantity": 1,
-            "Price": 60
+            "Price": 25,
+            "Images": "https://ecomdmsservice.s3.amazonaws.com/Product-images/1726328242139-Cauliflower.jpg"
         },
         {
             "Name": "Cucumber",
             "Quantity": 250,
-            "Price": 2
+            "Price": 8,
+            "Images": "https://ecomdmsservice.s3.amazonaws.com/Product-images/1726328245471-cucumber.jpg"
+        },
+        {
+            "Name": "Kolkata bagun",
+            "Quantity": 250,
+            "Price": 25,
+            "Images": "https://ecomdmsservice.s3.amazonaws.com/Product-images/1726328255821-kolkata-bringile.png"
+        },
+        {
+            "Name": "Red Capsicum",
+            "Quantity": 1,
+            "Price": 120,
+            "Images": [
+                "https://prod-promodeargo-admin-api-mediabucket46c59097-tynsj9joexji.s3.us-east-1.amazonaws.com/Q%EF%BF%BD%EF%BF%BD3%3A%EF%BF%BD%EF%BF%BD%2C%EF%BF%BD%EF%BF%BD%EF%BF%BD%EF%BF%BD3d%EF%BF%BD7Red%20Capsicum.jpeg"
+            ]
+        },
+        {
+            "Name": "Strawberry",
+            "Quantity": 250,
+            "Price": 30,
+            "Images": "https://ecomdmsservice.s3.amazonaws.com/Product-images/1726328276860-strawberry.jpg"
         }
     ],
     "CostDetails": {
-        "SubTotal": 122,
+        "SubTotal": 208,
         "ShippingCharges": 0,
-        "GrossDetails": 122,
-        "TotalAmount": "122.00"
+        "GrossDetails": 208,
+        "TotalAmount": "208.00"
     }
 }
 ```
