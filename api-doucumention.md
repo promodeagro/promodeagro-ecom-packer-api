@@ -32,7 +32,7 @@ This endpoint is used to UnpackedOrders.
             "OrderId": "401-3680557-6464026",
             "CustomerName": "umran",
             "TotalItems": 1,
-            "OrderStatus": "delivered"
+            "OrderStatus": "order placed"
         }
     ]
 ```
