@@ -68,7 +68,7 @@ exports.handler = async (event) => {
 
             return {
                 Name: item.productName || "Unknown",
-                Quantity: item.quantityUnits,
+                Quantity: item.quantity,
                 unit: item.unit,
                 Price: item.price,
                 Images: images || []
