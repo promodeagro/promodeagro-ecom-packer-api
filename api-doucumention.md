@@ -224,10 +224,11 @@ The request body should be a JSON object with the following fields:
 
 ```json
 {
-  "userId": "0076c700-adc1-49d0-bd60-f97d77c9e688",
+  "userId": "41b554ce-a17e-4c3f-9b16-45a255054909",
   "userName": "sukanta halder",
   "email": "haldersukanta372@gmail.com",
-  "newPassword": "Sukanta@546"
+  "oldPassword": "Sukanta@85370",
+  "newPassword": "Sukanta@853701"
 }
 ```
 ## Responce 200
