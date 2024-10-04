@@ -1,5 +1,5 @@
 updateProfile:
-    handler: profile-details/updateProfile.handler
+    handler: profile-details/updatePassword.handler
     role: ${env:LAMBDA_ROLE}
     events:
       - http:
