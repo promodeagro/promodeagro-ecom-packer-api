@@ -9,8 +9,9 @@ exports.handler = async (event) => {
     
     const userUpdateSchema = z.object({
         userId: z.string().min(1, { message: "User ID is required and cannot be empty." }),
-        userName: z.string().min(1, { message: "User name is required and cannot be empty." }),
-        email: z.string().email({ message: "A valid email address is required." }),
+        userName: z.string().optional(),
+        email: z.string().email({ message: "A valid email address is required." }).optional(),
+        oldPassword: z.string().min(1, { message: "Old password is required." }),
         newPassword: z.string()
             .min(8, { message: "Password must be at least 8 characters long." })
             .regex(passwordStrengthRegex, { message: "Password must include at least one uppercase letter and one special character." }),
@@ -18,7 +19,7 @@ exports.handler = async (event) => {
 
     try {
         const parsedBody = userUpdateSchema.parse(JSON.parse(event.body));
-        const { userId, userName, email, newPassword } = parsedBody;
+        const { userId, userName, email, oldPassword, newPassword } = parsedBody;
 
         // Get user details by userId
         const userParams = {
@@ -27,7 +28,6 @@ exports.handler = async (event) => {
                 UserId: userId,
             },
         };
-
         const data = await docClient.get(userParams).promise();
         if (!data.Item) {
             return {
@@ -39,36 +39,24 @@ exports.handler = async (event) => {
                 body: JSON.stringify({ message: "User not found", statusCode: 404 }),
             };
         }
-
         const user = data.Item;
-
-        // Verify userName and email
-        if (user.Name !== userName) {
+        // Verify old password
+        const oldPasswordHash = crypto.createHash('sha256').update(oldPassword).digest('hex');
+        if (user.PasswordHash !== oldPasswordHash) {
             return {
-                statusCode: 400,
+                statusCode: 401,
                 headers: {
                     "Access-Control-Allow-Origin": "*",
                     "Access-Control-Allow-Credentials": true,
                 },
-                body: JSON.stringify({ message: "User name does not match our records.", statusCode: 400 }),
-            };
-        }
-
-        if (user.email !== email) {
-            return {
-                statusCode: 400,
-                headers: {
-                    "Access-Control-Allow-Origin": "*",
-                    "Access-Control-Allow-Credentials": true,
-                },
-                body: JSON.stringify({ message: "Email does not match our records.", statusCode: 400 }),
+                body: JSON.stringify({ message: "Old password is incorrect.", statusCode: 401 }),
             };
         }
 
         // Hash the new password
         const newPasswordHash = crypto.createHash('sha256').update(newPassword).digest('hex');
 
-        // Update user details
+        // Update user password
         const updateParams = {
             TableName: process.env.USERS_TABLE,
             Key: {
@@ -106,7 +94,7 @@ exports.handler = async (event) => {
             statusCode: 500,
             headers: {
                 "Access-Control-Allow-Origin": "*",
-				"Access-Control-Allow-Credentials": true,
+                "Access-Control-Allow-Credentials": true,
             },
             body: JSON.stringify({ message: "Internal Server Error", error: error.message }),
         };
