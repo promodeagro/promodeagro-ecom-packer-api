@@ -1,0 +1,8 @@
+getNotifications:
+    handler: notification/getNotifications.handler
+    role: ${env:LAMBDA_ROLE}
+    events:
+      - http:
+          path: /notifications
+          method: get
+          cors: true 
