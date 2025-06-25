@@ -1,0 +1,25 @@
+functions:  
+  unpackedOrders:
+    handler: src/handlers/orders.unpacked_orders
+    events:
+      - http:
+          path: orders/unpacked
+          method: get
+  packedOrders:
+    handler: src/handlers/orders.packed_orders
+    events:
+      - http:
+          path: orders/packed
+          method: get
+  startOrder:
+    handler: src/handlers/orders.start_order
+    events:
+      - http:
+          path: orders/start/{order_id}
+          method: get
+  completeOrder:
+    handler: src/handlers/orders.complete_order
+    events:
+      - http:
+          path: orders/complete
+          method: post 

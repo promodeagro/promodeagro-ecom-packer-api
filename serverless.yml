@@ -1,0 +1,97 @@
+service: promodeagro-ecom-packer-api
+
+plugins:
+  - serverless-python-requirements
+  - serverless-dotenv-plugin
+  - serverless-offline
+
+custom:
+  pythonRequirements:
+    dockerizePip: true
+  dotenv:
+    path: .env
+
+provider:
+  name: aws
+  runtime: python3.9
+  region: ${env:AWS_REGION, 'ap-south-1'}
+
+functions:
+  login:
+    handler: src/handlers/auth.login
+    events:
+      - http:
+          path: login
+          method: post
+  forgotPassword:
+    handler: src/handlers/auth.forgot_password
+    events:
+      - http:
+          path: forgot-password
+          method: post
+  verifyOtp:
+    handler: src/handlers/auth.verify_otp
+    events:
+      - http:
+          path: verify-otp
+          method: post
+  resetPassword:
+    handler: src/handlers/auth.reset_password
+    events:
+      - http:
+          path: reset-password
+          method: post
+  logout:
+    handler: src/handlers/auth.logout
+    events:
+      - http:
+          path: logout
+          method: post
+  unpackedOrders:
+    handler: src/handlers/orders.unpacked_orders
+    events:
+      - http:
+          path: orders/unpacked
+          method: get
+  packedOrders:
+    handler: src/handlers/orders.packed_orders
+    events:
+      - http:
+          path: orders/packed
+          method: get
+  startOrder:
+    handler: src/handlers/orders.start_order
+    events:
+      - http:
+          path: orders/start/{order_id}
+          method: get
+  completeOrder:
+    handler: src/handlers/orders.complete_order
+    events:
+      - http:
+          path: orders/complete
+          method: post
+  getNotifications:
+    handler: src/handlers/notifications.get_notifications
+    events:
+      - http:
+          path: notifications
+          method: get
+  getProfile:
+    handler: src/handlers/profile.get_profile
+    events:
+      - http:
+          path: profile
+          method: get
+  updateProfile:
+    handler: src/handlers/profile.update_profile
+    events:
+      - http:
+          path: profile/update
+          method: post
+  changePassword:
+    handler: src/handlers/profile.change_password
+    events:
+      - http:
+          path: profile/change-password
+          method: post

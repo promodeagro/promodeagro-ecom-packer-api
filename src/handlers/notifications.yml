@@ -1,0 +1,37 @@
+functions:
+  getNotifications:
+    handler: src/handlers/notifications.get_notifications
+    events:
+      - http:
+          path: notifications
+          method: get
+  login:
+    handler: src/handlers/auth.login
+    events:
+      - http:
+          path: login
+          method: post
+  forgotPassword:
+    handler: src/handlers/auth.forgot_password
+    events:
+      - http:
+          path: forgot-password
+          method: post
+  verifyOtp:
+    handler: src/handlers/auth.verify_otp
+    events:
+      - http:
+          path: verify-otp
+          method: post
+  resetPassword:
+    handler: src/handlers/auth.reset_password
+    events:
+      - http:
+          path: reset-password
+          method: post
+  logout:
+    handler: src/handlers/auth.logout
+    events:
+      - http:
+          path: logout
+          method: post 

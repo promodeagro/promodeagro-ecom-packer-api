@@ -1,0 +1,14 @@
+{
+  "name": "promodeagro-ecom-packer-api",
+  "version": "1.0.0",
+  "description": "Python serverless API",
+  "scripts": {
+    "offline": "sls offline",
+    "deploy": "sls deploy"
+  },
+  "devDependencies": {
+    "serverless-dotenv-plugin": "^4.0.2",
+    "serverless-offline": "^12.0.4",
+    "serverless-python-requirements": "^6.1.2"
+  }
+}

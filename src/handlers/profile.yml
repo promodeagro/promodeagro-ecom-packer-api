@@ -1,0 +1,19 @@
+functions:
+  getProfile:
+    handler: src/handlers/profile.get_profile
+    events:
+      - http:
+          path: profile
+          method: get
+  updateProfile:
+    handler: src/handlers/profile.update_profile
+    events:
+      - http:
+          path: profile/update
+          method: post
+  changePassword:
+    handler: src/handlers/profile.change_password
+    events:
+      - http:
+          path: profile/change-password
+          method: post 

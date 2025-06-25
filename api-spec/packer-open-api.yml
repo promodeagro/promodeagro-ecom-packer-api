@@ -1,0 +1,431 @@
+openapi: 3.0.0
+info:
+  title: Packer Application API
+  version: 1.0.0
+  description: Combined API for Authentication, Orders, Notifications, and Profile
+paths:
+  /login:
+    post:
+      summary: User login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  minLength: 8
+                  pattern: "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,}$"
+              required:
+                - email
+                - password
+      responses:
+        '200':
+          description: Successful login
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  user_id:
+                    type: string
+        '401':
+          description: Invalid credentials
+  /forgot-password:
+    post:
+      summary: Initiate password reset
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+              required:
+                - email
+      responses:
+        '200':
+          description: OTP sent successfully
+        '404':
+          description: Email not found
+  /verify-otp:
+    post:
+      summary: Verify OTP
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                otp:
+                  type: string
+                  pattern: "^\\d{6}$"
+              required:
+                - email
+                - otp
+      responses:
+        '200':
+          description: OTP verified
+        '401':
+          description: Invalid OTP
+  /reset-password:
+    post:
+      summary: Reset password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                new_password:
+                  type: string
+                  minLength: 8
+                  pattern: "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,}$"
+                confirm_password:
+                  type: string
+              required:
+                - email
+                - new_password
+                - confirm_password
+      responses:
+        '200':
+          description: Password reset successful
+        '400':
+          description: Passwords don't match
+  /notifications:
+    get:
+      summary: Get user notifications
+      responses:
+        '200':
+          description: List of notifications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                    order_id:
+                      type: string
+                    timestamp:
+                      type: string
+                      format: date-time
+  /logout:
+    post:
+      summary: User logout
+      responses:
+        '200':
+          description: Logged out successfully
+  /profile:
+    get:
+      summary: Get user profile
+      responses:
+        '200':
+          description: User profile
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  username:
+                    type: string
+                  email:
+                    type: string
+                    format: email
+                  profile_image:
+                    type: string
+  /profile/update:
+    post:
+      summary: Update profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                email:
+                  type: string
+                  format: email
+              required:
+                - username
+                - email
+      responses:
+        '200':
+          description: Profile updated
+        '400':
+          description: Invalid data
+  /profile/change-password:
+    post:
+      summary: Change password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                current_password:
+                  type: string
+                new_password:
+                  type: string
+                  minLength: 8
+                  pattern: "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,}$"
+                confirm_password:
+                  type: string
+              required:
+                - current_password
+                - new_password
+                - confirm_password
+      responses:
+        '200':
+          description: Password changed
+        '400':
+          description: Invalid data
+  /orders/unpacked:
+    get:
+      summary: Get list of unpacked orders
+      tags:
+        - Orders
+      responses:
+        '200':
+          description: List of unpacked orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrderSummary'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /orders/packed:
+    get:
+      summary: Get list of packed orders
+      tags:
+        - Orders
+      parameters:
+        - name: sort
+          in: query
+          description: Sort order (asc or desc)
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+      responses:
+        '200':
+          description: List of packed orders with packing timestamps
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  allOf:
+                    - $ref: '#/components/schemas/OrderSummary'
+                    - type: object
+                      properties:
+                        packed_at:
+                          type: string
+                          format: date-time
+                        packed_by:
+                          type: string
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /orders/start/{order_id}:
+    get:
+      summary: Get order details for packing
+      tags:
+        - Orders
+      parameters:
+        - name: order_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The order ID to retrieve
+      responses:
+        '200':
+          description: Order details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderDetails'
+        '404':
+          description: Order not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /orders/complete:
+    post:
+      summary: Complete order packing
+      tags:
+        - Orders
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                order_id:
+                  type: string
+                photo:
+                  type: string
+                  format: byte
+                packed_by:
+                  type: string
+              required:
+                - order_id
+                - photo
+                - packed_by
+      responses:
+        '200':
+          description: Order packed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  order_id:
+                    type: string
+                  packed_at:
+                    type: string
+                    format: date-time
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    OrderSummary:
+      type: object
+      properties:
+        order_id:
+          type: string
+        customer_name:
+          type: string
+        total_items:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+      required:
+        - order_id
+        - customer_name
+        - total_items
+    OrderDetails:
+      type: object
+      properties:
+        order_id:
+          type: string
+        customer_name:
+          type: string
+        payment:
+          type: string
+          enum: [paid, unpaid, partial]
+        price:
+          type: number
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+        cost_details:
+          $ref: '#/components/schemas/CostDetails'
+        status:
+          type: string
+          enum: [unpacked, packed]
+        created_at:
+          type: string
+          format: date-time
+      required:
+        - order_id
+        - customer_name
+        - items
+        - cost_details
+    OrderItem:
+      type: object
+      properties:
+        image:
+          type: string
+        name:
+          type: string
+        quantity:
+          type: integer
+        price:
+          type: number
+        sku:
+          type: string
+      required:
+        - name
+        - quantity
+        - price
+    CostDetails:
+      type: object
+      properties:
+        sub_total:
+          type: number
+        shipping_charges:
+          type: number
+        tax:
+          type: number
+        discount:
+          type: number
+        total_amount:
+          type: number
+      required:
+        - sub_total
+        - shipping_charges
+        - tax
+        - discount
+        - total_amount
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
