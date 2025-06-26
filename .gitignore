@@ -1,0 +1,28 @@
+# Python virtual environments
+venv/
+.venv/
+
+# Node.js dependencies
+node_modules/
+
+# Editor/IDE settings
+.vscode/
+
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Environment/config files
+.env
+.env.*
+
+# macOS system files
+.DS_Store
+
+# Log files
+*.log
+
+# SQLite database files
+*.sqlite3 
