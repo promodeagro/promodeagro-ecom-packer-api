@@ -8,6 +8,8 @@ import json
 import logging
 import boto3
 from boto3.dynamodb.conditions import Key
+from src.commonfunctions.utils import require_auth, format_response, convert_decimal
+import decimal
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -15,115 +17,102 @@ logger.setLevel(logging.INFO)
 dynamodb = boto3.resource('dynamodb')
 USERS_TABLE = os.environ.get('USERS_TABLE', 'prod-promodeagro-packerTable-Users')
 
+def convert_decimal(obj):
+    if isinstance(obj, list):
+        return [convert_decimal(i) for i in obj]
+    elif isinstance(obj, dict):
+        return {k: convert_decimal(v) for k, v in obj.items()}
+    elif isinstance(obj, decimal.Decimal):
+        # Convert to int if possible, else float
+        if obj % 1 == 0:
+            return int(obj)
+        else:
+            return float(obj)
+    else:
+        return obj
+
 def get_profile(event, context):
+    # IGNORE AUTH: Authorization check is disabled for development/testing
+    # error, token = require_auth(event)
+    # if error:
+    #     return error
     try:
-        user_id = event.get('queryStringParameters', {}).get('user_id')
-        if not user_id:
-            logger.warning('Missing user_id for get_profile')
-            return {
-                'statusCode': 400,
-                'body': json.dumps({'message': 'user_id is required'})
-            }
+        email = event.get('queryStringParameters', {}).get('email')
+        if not email:
+            logger.warning('Missing email for get_profile')
+            return format_response(400, {'message': 'email is required'})
         table = dynamodb.Table(USERS_TABLE)
-        response = table.get_item(Key={'user_id': user_id})
+        response = table.get_item(Key={'email': email})
         user = response.get('Item')
         if not user:
-            logger.info(f'User not found: {user_id}')
-            return {
-                'statusCode': 404,
-                'body': json.dumps({'message': 'User not found'})
-            }
-        logger.info(f'Retrieved profile for {user_id}')
-        return {
-            'statusCode': 200,
-            'body': json.dumps(user)
-        }
+            logger.info(f'User not found: {email}')
+            return format_response(404, {'message': 'User not found'})
+        user = convert_decimal(user)
+        logger.info(f'Retrieved profile for {email}')
+        return format_response(200, user)
     except Exception as e:
         logger.error(f'Get profile error: {str(e)}', exc_info=True)
-        return {
-            'statusCode': 500,
-            'body': json.dumps({'message': 'Internal server error', 'error': str(e)})
-        }
+        return format_response(500, {'message': 'Internal server error', 'error': str(e)})
 
 def update_profile(event, context):
+    # IGNORE AUTH: Authorization check is disabled for development/testing
+    # error, token = require_auth(event)
+    # if error:
+    #     return error
     try:
         body = json.loads(event.get('body', '{}'))
-        user_id = body.get('user_id')
-        username = body.get('username')
         email = body.get('email')
-        if not user_id or not username or not email:
+        username = body.get('username')
+        if not email or not username:
             logger.warning('Missing fields for update_profile')
-            return {
-                'statusCode': 400,
-                'body': json.dumps({'message': 'user_id, username, and email are required'})
-            }
+            return format_response(400, {'message': 'email and username are required'})
         table = dynamodb.Table(USERS_TABLE)
-        response = table.get_item(Key={'user_id': user_id})
+        response = table.get_item(Key={'email': email})
         user = response.get('Item')
         if not user:
-            logger.info(f'User not found: {user_id}')
-            return {
-                'statusCode': 404,
-                'body': json.dumps({'message': 'User not found'})
-            }
+            logger.info(f'User not found: {email}')
+            return format_response(404, {'message': 'User not found'})
         table.update_item(
-            Key={'user_id': user_id},
-            UpdateExpression='SET username = :u, email = :e',
-            ExpressionAttributeValues={':u': username, ':e': email}
+            Key={'email': email},
+            UpdateExpression='SET username = :u',
+            ExpressionAttributeValues={':u': username}
         )
-        logger.info(f'Profile updated for {user_id}')
-        return {
-            'statusCode': 200,
-            'body': json.dumps({'message': 'Profile updated'})
-        }
+        logger.info(f'Profile updated for {email}')
+        return format_response(200, {'message': 'Profile updated'})
     except Exception as e:
         logger.error(f'Update profile error: {str(e)}', exc_info=True)
-        return {
-            'statusCode': 500,
-            'body': json.dumps({'message': 'Internal server error', 'error': str(e)})
-        }
+        return format_response(500, {'message': 'Internal server error', 'error': str(e)})
 
 def change_password(event, context):
+    # IGNORE AUTH: Authorization check is disabled for development/testing
+    # error, token = require_auth(event)
+    # if error:
+    #     return error
     try:
         body = json.loads(event.get('body', '{}'))
-        user_id = body.get('user_id')
+        email = body.get('email')
         current_password = body.get('current_password')
         new_password = body.get('new_password')
         confirm_password = body.get('confirm_password')
-        if not user_id or not current_password or not new_password or not confirm_password:
+        if not email or not current_password or not new_password or not confirm_password:
             logger.warning('Missing fields for change_password')
-            return {
-                'statusCode': 400,
-                'body': json.dumps({'message': 'All fields are required'})
-            }
-        if new_password != confirm_password:
-            logger.info(f'Passwords do not match for {user_id}')
-            return {
-                'statusCode': 400,
-                'body': json.dumps({'message': "Passwords don't match"})
-            }
+            return format_response(400, {'message': 'All fields are required (email, current_password, new_password, confirm_password)'})
         table = dynamodb.Table(USERS_TABLE)
-        response = table.get_item(Key={'user_id': user_id})
+        response = table.get_item(Key={'email': email})
         user = response.get('Item')
         if not user or user.get('password') != current_password:
-            logger.info(f'Current password incorrect for {user_id}')
-            return {
-                'statusCode': 400,
-                'body': json.dumps({'message': 'Current password is incorrect'})
-            }
+            logger.info(f'Current password incorrect for {email}')
+            return format_response(400, {'message': 'Current password is incorrect'})
+        if new_password != confirm_password:
+            logger.info(f'Passwords do not match for {email}')
+            return format_response(400, {'message': "Passwords don't match"})
         table.update_item(
-            Key={'user_id': user_id},
+            Key={'email': email},
             UpdateExpression='SET password = :pw',
             ExpressionAttributeValues={':pw': new_password}
         )
-        logger.info(f'Password changed for {user_id}')
-        return {
-            'statusCode': 200,
-            'body': json.dumps({'message': 'Password changed'})
-        }
+        logger.info(f'Password changed for {email}')
+        return format_response(200, {'message': 'Password changed'})
     except Exception as e:
         logger.error(f'Change password error: {str(e)}', exc_info=True)
-        return {
-            'statusCode': 500,
-            'body': json.dumps({'message': 'Internal server error', 'error': str(e)})
-        } 
+        return format_response(500, {'message': 'Internal server error', 'error': str(e)}) 
