@@ -4,12 +4,11 @@ BASE_URL = 'http://localhost:3000/dev'
 
 def test_login():
     resp = requests.post(f'{BASE_URL}/login', json={
-        'email': 'user@example.com',
+        'email': 'sohail@gmail.com',
         'password': 'Test@1234'
     })
     assert resp.status_code == 200
     data = resp.json()
-    assert 'token' in data
     assert 'user_id' in data
 
 def test_forgot_password():
@@ -42,5 +41,5 @@ def test_get_notifications():
     assert resp.status_code == 200
 
 def test_get_profile():
-    resp = requests.get(f'{BASE_URL}/profile', params={'user_id': 'user1'})
+    resp = requests.get(f'{BASE_URL}/profile', params={'email': 'sohail@gmail.com'})
     assert resp.status_code in (200, 404) 

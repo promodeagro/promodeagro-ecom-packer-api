@@ -71,6 +71,12 @@ functions:
       - http:
           path: orders/complete
           method: post
+  getCompletedOrderDetails:
+    handler: src/handlers/orders.get_completed_order_details
+    events:
+      - http:
+          path: orders/completed/{order_id}
+          method: get
   getNotifications:
     handler: src/handlers/notifications.get_notifications
     events:
