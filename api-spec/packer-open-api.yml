@@ -217,13 +217,21 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/OrderSummary'
-        '500':
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+                  type: object
+                  properties:
+                    order_id:
+                      type: string
+                    customer_name:
+                      type: string
+                    total_items:
+                      type: integer
+                    created_at:
+                      type: string
+                      format: date-time
+      required:
+        - order_id
+        - customer_name
+        - total_items
   /orders/packed:
     get:
       summary: Get list of packed orders
@@ -341,6 +349,137 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /orders:
+    post:
+      summary: Create a new order
+      tags:
+        - Orders
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewOrder'
+      responses:
+        '201':
+          description: Order created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderDetails'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /orders/{order_id}/assign-packer:
+    post:
+      summary: Assign order to a packer
+      tags:
+        - Orders
+      parameters:
+        - name: order_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                packer_id:
+                  type: string
+              required:
+                - packer_id
+      responses:
+        '200':
+          description: Order assigned to packer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderDetails'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /orders/{order_id}/mark-items-unavailable:
+    post:
+      summary: Mark items as not available in an order
+      tags:
+        - Orders
+      parameters:
+        - name: order_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                items:
+                  type: array
+                  items:
+                    type: string
+              required:
+                - items
+      responses:
+        '200':
+          description: Items marked as not available
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderDetails'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /orders/{order_id}/assign-rider:
+    post:
+      summary: Assign order to a rider
+      tags:
+        - Orders
+      parameters:
+        - name: order_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                rider_id:
+                  type: string
+              required:
+                - rider_id
+      responses:
+        '200':
+          description: Order assigned to rider
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderDetails'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 components:
   schemas:
     OrderSummary:
@@ -429,3 +568,45 @@ components:
       properties:
         message:
           type: string
+    NewOrder:
+      type: object
+      properties:
+        address:
+          type: object
+        customerId:
+          type: string
+        customerName:
+          type: string
+        customerNumber:
+          type: string
+        deliveryCharges:
+          type: number
+        deliverySlot:
+          type: object
+        finalTotal:
+          type: number
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+        paymentDetails:
+          type: object
+        savings:
+          type: number
+        subTotal:
+          type: number
+        tax:
+          type: number
+        totalPrice:
+          type: number
+        totalSavings:
+          type: number
+        userId:
+          type: string
+      required:
+        - address
+        - customerId
+        - customerName
+        - customerNumber
+        - items
+        - userId

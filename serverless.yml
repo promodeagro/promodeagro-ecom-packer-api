@@ -77,6 +77,30 @@ functions:
       - http:
           path: orders/completed/{order_id}
           method: get
+  createOrder:
+    handler: src/handlers/orders.create_order
+    events:
+      - http:
+          path: orders
+          method: post
+  assignPacker:
+    handler: src/handlers/orders.assign_packer
+    events:
+      - http:
+          path: orders/{order_id}/assign-packer
+          method: post
+  markItemsUnavailable:
+    handler: src/handlers/orders.mark_items_unavailable
+    events:
+      - http:
+          path: orders/{order_id}/mark-items-unavailable
+          method: post
+  assignRider:
+    handler: src/handlers/orders.assign_rider
+    events:
+      - http:
+          path: orders/{order_id}/assign-rider
+          method: post
   getNotifications:
     handler: src/handlers/notifications.get_notifications
     events:
